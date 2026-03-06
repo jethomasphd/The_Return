@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE RETURN — A Passion in Seven Stations</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel:wght@400;700;900&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #050302;
+    --deep: #0a0704;
+    --parchment: #d4b083;
+    --gold: #c9a227;
+    --bone: #f0e6cc;
+    --ash: #7a6e60;
+    --blood: #7a0f0f;
+    --crimson: #9b1515;
+    --cold: #8faab8;
+    --ice: #6b9aaa;
+    --steel: #4a6572;
+    --form-bg: #0e1a20;
+    --form-border: #2a4a5a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--parchment);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    line-height: 1.85;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* GRAIN OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.35;
+  }
+
+  /* PARTICLE CANVAS */
+  #particles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* TITLE SCREEN */
+  #title-screen {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--void);
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 2s ease;
+  }
+
+  #title-screen.dissolving {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .title-cross {
+    position: relative;
+    width: 2px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin-bottom: 40px;
+    animation: crossPulse 3s ease-in-out infinite;
+  }
+
+  .title-cross::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+
+  @keyframes crossPulse {
+    0%, 100% { opacity: 0.4; box-shadow: 0 0 8px var(--gold); }
+    50% { opacity: 1; box-shadow: 0 0 30px var(--gold), 0 0 60px rgba(201,162,39,0.3); }
+  }
+
+  .title-main {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    color: var(--bone);
+    text-shadow: 0 0 40px rgba(201,162,39,0.5), 0 0 80px rgba(201,162,39,0.2);
+    animation: titleBreath 4s ease-in-out infinite;
+  }
+
+  @keyframes titleBreath {
+    0%, 100% { text-shadow: 0 0 20px rgba(201,162,39,0.3); }
+    50% { text-shadow: 0 0 60px rgba(201,162,39,0.7), 0 0 100px rgba(201,162,39,0.3); }
+  }
+
+  .title-sub {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ash);
+    letter-spacing: 0.2em;
+    font-size: 1rem;
+    margin-top: 16px;
+    animation: fadeInSlow 3s ease 1s both;
+  }
+
+  .title-latin {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 0.85rem;
+    margin-top: 40px;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+    animation: fadeInSlow 3s ease 2s both;
+    text-align: center;
+    max-width: 400px;
+  }
+
+  .title-prompt {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: var(--ash);
+    margin-top: 60px;
+    animation: blink 2s ease-in-out infinite 3s both;
+    text-transform: uppercase;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  @keyframes fadeInSlow {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MAIN CONTENT */
+  #main-content {
+    display: none;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* STATION DIVIDERS */
+  .station {
+    min-height: 100vh;
+    padding: 15vh 10vw;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .station-header {
+    text-align: center;
+    margin-bottom: 8vh;
+    width: 100%;
+  }
+
+  .station-number {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  .station-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 4vw, 3.2rem);
+    font-weight: 700;
+    color: var(--bone);
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+  }
+
+  .station-subtitle {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ash);
+    font-size: 0.9rem;
+    margin-top: 10px;
+    letter-spacing: 0.15em;
+  }
+
+  .divider-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 0 auto 40px;
+  }
+
+  /* TEXT BLOCKS */
+  .prose-block {
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto 3em;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+
+  .prose-block.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .prose-block p {
+    margin-bottom: 1.4em;
+    color: var(--parchment);
+  }
+
+  .prose-block p:first-child::first-letter {
+    font-size: 3.5em;
+    font-family: 'Cinzel', serif;
+    float: left;
+    line-height: 0.7;
+    margin: 0.1em 0.1em 0 0;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(201,162,39,0.5);
+  }
+
+  /* SACRED VERSE STYLING */
+  .sacred-verse {
+    border-left: 2px solid var(--gold);
+    padding: 1.5em 2em;
+    margin: 2em auto;
+    max-width: 580px;
+    background: rgba(201,162,39,0.03);
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.05em;
+    color: var(--bone);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+    position: relative;
+  }
+
+  .sacred-verse::before {
+    content: '✦';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--gold);
+    font-size: 0.8rem;
+    background: var(--void);
+    padding: 0 8px;
+  }
+
+  .sacred-verse.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sacred-verse .beatitude {
+    display: block;
+    margin-bottom: 0.6em;
+    color: var(--gold);
+  }
+
+  /* HORROR ELEMENTS — BUREAUCRATIC INTRUSIONS */
+  .horror-document {
+    max-width: 680px;
+    width: 100%;
+    margin: 3em auto;
+    background: #080e12;
+    border: 1px solid var(--form-border);
+    padding: 2em;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    color: var(--cold);
+    opacity: 0;
+    transform: translateY(20px) scale(0.99);
+    transition: opacity 1s ease, transform 1s ease;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(107,154,170,0.03);
+  }
+
+  .horror-document.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .horror-document::before {
+    content: 'U.S. DEPARTMENT OF HOMELAND SECURITY';
+    display: block;
+    color: var(--steel);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    border-bottom: 1px solid var(--form-border);
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+  }
+
+  .horror-document .doc-title {
+    color: var(--ice);
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5em;
+    font-weight: bold;
+  }
+
+  .horror-document .field-row {
+    display: flex;
+    gap: 2em;
+    margin-bottom: 0.8em;
+    flex-wrap: wrap;
+  }
+
+  .horror-document .field {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .horror-document .field-label {
+    color: var(--steel);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .horror-document .field-value {
+    border-bottom: 1px solid var(--form-border);
+    padding-bottom: 3px;
+    color: var(--cold);
+    font-size: 0.78rem;
+  }
+
+  .horror-document .stamp {
+    display: inline-block;
+    border: 2px solid var(--crimson);
+    color: var(--crimson);
+    font-size: 1rem;
+    letter-spacing: 0.3em;
+    padding: 0.3em 0.8em;
+    transform: rotate(-3deg);
+    margin-top: 1.5em;
+    opacity: 0;
+    font-weight: bold;
+    animation: none;
+  }
+
+  .horror-document .stamp.stamped {
+    animation: stampIn 0.3s cubic-bezier(0.36,0.07,0.19,0.97) forwards;
+  }
+
+  @keyframes stampIn {
+    0% { opacity: 0; transform: rotate(-3deg) scale(2); }
+    60% { opacity: 1; transform: rotate(-3deg) scale(0.95); }
+    100% { opacity: 0.85; transform: rotate(-3deg) scale(1); }
+  }
+
+  /* TWEET HORROR */
+  .horror-tweet {
+    max-width: 500px;
+    width: 100%;
+    margin: 3em auto;
+    background: #060d12;
+    border: 1px solid #1a2f3a;
+    border-left: 4px solid var(--blood);
+    padding: 1.8em;
+    font-family: 'Courier New', monospace;
+    font-size: 0.82rem;
+    color: #7a9aaa;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+    position: relative;
+  }
+
+  .horror-tweet.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .horror-tweet::before {
+    content: '𝕏  TRUTH SOCIAL POST  —  VERIFIED ACCOUNT';
+    display: block;
+    color: var(--steel);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 1em;
+    opacity: 0.6;
+  }
+
+  .horror-tweet .tweet-author {
+    color: var(--ice);
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .horror-tweet .tweet-text {
+    color: #8faab8;
+    line-height: 1.6;
+    margin-bottom: 1em;
+    font-size: 0.9rem;
+    font-family: 'Courier New', monospace;
+  }
+
+  .horror-tweet .tweet-text .caps {
+    color: #a0bbc8;
+    font-weight: bold;
+  }
+
+  .horror-tweet .tweet-metrics {
+    color: var(--steel);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    border-top: 1px solid #1a2f3a;
+    padding-top: 0.8em;
+    display: flex;
+    gap: 2em;
+  }
+
+  .horror-tweet .metric-like {
+    color: var(--blood);
+  }
+
+  /* GLITCH */
+  .glitch {
+    position: relative;
+    display: inline-block;
+  }
+
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .glitch::before {
+    color: var(--crimson);
+    animation: glitch1 4s infinite;
+    clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+  }
+
+  .glitch::after {
+    color: var(--ice);
+    animation: glitch2 4s infinite;
+    clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+  }
+
+  @keyframes glitch1 {
+    0%, 90%, 100% { transform: translateX(0); opacity: 0; }
+    92% { transform: translateX(-3px); opacity: 0.8; }
+    94% { transform: translateX(3px); opacity: 0; }
+    96% { transform: translateX(-2px); opacity: 0.6; }
+  }
+
+  @keyframes glitch2 {
+    0%, 90%, 100% { transform: translateX(0); opacity: 0; }
+    93% { transform: translateX(3px); opacity: 0.6; }
+    95% { transform: translateX(-3px); opacity: 0; }
+    97% { transform: translateX(2px); opacity: 0.4; }
+  }
+
+  /* BLOOD TEXT */
+  .blood-text {
+    color: var(--crimson);
+    font-style: italic;
+  }
+
+  /* GOLD EMPHASIS */
+  .gold-text {
+    color: var(--gold);
+  }
+
+  /* SACRED DIALOGUE */
+  .sacred-dialogue {
+    max-width: 600px;
+    width: 100%;
+    margin: 2em auto;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.2s ease 0.2s, transform 1.2s ease 0.2s;
+  }
+
+  .sacred-dialogue.revealed { opacity: 1; transform: translateY(0); }
+
+  .dialogue-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5em;
+    margin-bottom: 1.2em;
+    padding-bottom: 1.2em;
+    border-bottom: 1px solid rgba(201,162,39,0.08);
+  }
+
+  .speaker {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    min-width: 100px;
+    text-align: right;
+    padding-top: 3px;
+    flex-shrink: 0;
+  }
+
+  .speaker.divine { color: var(--gold); }
+  .speaker.cold { color: var(--steel); }
+
+  .dialogue-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--parchment);
+    flex: 1;
+  }
+
+  .dialogue-text.divine-words {
+    color: var(--bone);
+    font-size: 1.05em;
+  }
+
+  /* STATION ATMOSPHERE BACKGROUNDS */
+  .station-desert { background: radial-gradient(ellipse at 30% 80%, rgba(100,60,20,0.12) 0%, transparent 60%); }
+  .station-video { background: radial-gradient(ellipse at 70% 30%, rgba(20,50,70,0.15) 0%, transparent 60%); }
+  .station-healing { background: radial-gradient(ellipse at 50% 50%, rgba(201,162,39,0.04) 0%, transparent 60%); }
+  .station-sermon { background: radial-gradient(ellipse at 30% 30%, rgba(201,162,39,0.06) 0%, transparent 50%); }
+  .station-hearing { background: radial-gradient(ellipse at 60% 60%, rgba(122,15,15,0.1) 0%, transparent 60%); }
+  .station-lastnight { background: radial-gradient(ellipse at 40% 40%, rgba(201,162,39,0.08) 0%, transparent 60%); }
+  .station-departure { background: radial-gradient(ellipse at 50% 20%, rgba(122,15,15,0.08) 0%, transparent 50%); }
+
+  /* SEPARATOR / STATION TRANSITION */
+  .station-break {
+    text-align: center;
+    padding: 6vh 0;
+    position: relative;
+  }
+
+  .station-break::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,162,39,0.2), transparent);
+    margin-bottom: 30px;
+  }
+
+  /* FOOTER / CODA */
+  .coda {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15vh 10vw;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 50%, rgba(201,162,39,0.05) 0%, transparent 70%);
+  }
+
+  .coda-cross {
+    width: 1px;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 0 auto 60px;
+    position: relative;
+    animation: crossPulse 4s ease-in-out infinite;
+  }
+
+  .coda-cross::before {
+    content: '';
+    position: absolute;
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+
+  .coda-verse {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--parchment);
+    max-width: 680px;
+    line-height: 2;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 2s ease, transform 2s ease;
+  }
+
+  .coda-verse.revealed { opacity: 1; transform: translateY(0); }
+
+  .coda-verse .coda-line-blood {
+    color: var(--crimson);
+    font-style: italic;
+  }
+
+  .coda-final {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    margin-top: 60px;
+    opacity: 0;
+    transition: opacity 3s ease 1s;
+    text-align: center;
+    line-height: 2.2;
+  }
+
+  .coda-final.revealed { opacity: 1; }
+
+  .coda-signature {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ash);
+    font-size: 0.85rem;
+    margin-top: 80px;
+    opacity: 0;
+    transition: opacity 2s ease 2s;
+    letter-spacing: 0.1em;
+  }
+
+  .coda-signature.revealed { opacity: 0.6; }
+
+  /* NAME INPUT HORROR */
+  .sign-block {
+    max-width: 600px;
+    width: 100%;
+    margin: 3em auto;
+    padding: 2.5em;
+    border: 1px solid rgba(122,15,15,0.3);
+    background: rgba(10,4,4,0.8);
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+
+  .sign-block.revealed { opacity: 1; }
+
+  .sign-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--steel);
+    margin-bottom: 1.5em;
+    display: block;
+    text-transform: uppercase;
+  }
+
+  .sign-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--crimson);
+    color: var(--parchment);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    text-align: center;
+    width: 300px;
+    padding: 8px;
+    outline: none;
+    letter-spacing: 0.1em;
+  }
+
+  .sign-input::placeholder { color: var(--ash); opacity: 0.5; }
+
+  .sign-btn {
+    display: block;
+    margin: 1.5em auto 0;
+    padding: 0.6em 2em;
+    background: transparent;
+    border: 1px solid var(--crimson);
+    color: var(--crimson);
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .sign-btn:hover {
+    background: rgba(122,15,15,0.1);
+    box-shadow: 0 0 20px rgba(122,15,15,0.3);
+  }
+
+  .sign-consequence {
+    margin-top: 1.5em;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ash);
+    font-size: 0.9rem;
+    min-height: 2em;
+    transition: color 1s ease;
+  }
+
+  .sign-consequence.condemned { color: var(--crimson); }
+
+  /* FOOTWASHING SCENE */
+  .footwash-scene {
+    max-width: 600px;
+    width: 100%;
+    margin: 2em auto;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+  }
+
+  .footwash-scene.revealed { opacity: 1; transform: translateY(0); }
+
+  .footwash-person {
+    display: flex;
+    align-items: center;
+    gap: 1.5em;
+    padding: 1.2em 0;
+    border-bottom: 1px solid rgba(201,162,39,0.08);
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .footwash-person.washed { opacity: 1; transform: translateX(0); }
+
+  .person-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    min-width: 160px;
+  }
+
+  .person-burden {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ash);
+    font-size: 0.9rem;
+  }
+
+  /* PROGRESS */
+  #progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--blood), var(--gold));
+    z-index: 100;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  #station-indicator {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .station-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ash);
+    opacity: 0.3;
+    transition: all 0.5s ease;
+    cursor: pointer;
+  }
+
+  .station-dot.active {
+    background: var(--gold);
+    opacity: 1;
+    box-shadow: 0 0 10px var(--gold);
+    transform: scale(1.5);
+  }
+
+  .station-dot.passed {
+    background: var(--blood);
+    opacity: 0.5;
+  }
+
+  /* EPIGRAPH */
+  .epigraph {
+    text-align: center;
+    padding: 15vh 10vw 8vh;
+    max-width: 700px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 2s ease, transform 2s ease;
+  }
+
+  .epigraph.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .epigraph-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    color: var(--parchment);
+    line-height: 2;
+    margin-bottom: 1em;
+  }
+
+  .epigraph-source {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+
+  /* KENOSIS - the emptying */
+  .kenosis-text {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--bone);
+    text-align: center;
+    margin: 4vh 0;
+    opacity: 0;
+    transition: opacity 2s ease, transform 2s ease;
+    transform: translateY(20px);
+    line-height: 1.8;
+  }
+
+  .kenosis-text.revealed { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .station { padding: 12vh 6vw; }
+    .horror-document, .horror-tweet { font-size: 0.7rem; }
+    .dialogue-line { flex-direction: column; gap: 0.5em; }
+    .speaker { text-align: left; min-width: auto; }
+    #station-indicator { display: none; }
+  }
+
+  /* SCROLL CARET */
+  .scroll-caret {
+    text-align: center;
+    margin-top: 6vh;
+    opacity: 0;
+    animation: caretFade 3s ease-in-out infinite;
+    font-size: 1.5rem;
+    color: var(--gold);
+    opacity: 0.3;
+  }
+
+  @keyframes caretFade {
+    0%, 100% { opacity: 0.1; transform: translateY(0); }
+    50% { opacity: 0.5; transform: translateY(8px); }
+  }
+
+  /* HAND ON GLASS */
+  .hand-on-glass {
+    max-width: 600px;
+    width: 100%;
+    margin: 3em auto;
+    padding: 3em;
+    background: rgba(5,3,2,0.9);
+    border: 1px solid rgba(201,162,39,0.15);
+    text-align: center;
+    opacity: 0;
+    transition: opacity 2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hand-on-glass::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(201,162,39,0.04) 0%, transparent 70%);
+  }
+
+  .hand-on-glass.revealed { opacity: 1; }
+
+  .hand-symbol {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1em;
+    filter: drop-shadow(0 0 20px rgba(201,162,39,0.4));
+    animation: handPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes handPulse {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(201,162,39,0.2)); }
+    50% { filter: drop-shadow(0 0 30px rgba(201,162,39,0.6)); }
+  }
+
+  .hand-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1.1rem;
+    line-height: 2;
+  }
+
+  /* HORROR FLICKER on certain elements */
+  @keyframes subtleFlicker {
+    0%, 97%, 100% { opacity: 1; }
+    98% { opacity: 0.7; }
+    99% { opacity: 0.95; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen" onclick="beginNarrative()">
+  <div class="title-cross"></div>
+  <div class="title-main">THE RETURN</div>
+  <div class="title-sub">A Passion in Seven Stations</div>
+  <div class="title-latin">
+    Et Verbum caro factum est et habitavit in nobis<br>
+    <span style="font-size:0.75rem; opacity:0.5;">And the Word became flesh and dwelt among us — John 1:14</span>
+  </div>
+  <div class="title-prompt">Touch to Enter</div>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress-bar"></div>
+<div id="station-indicator">
+  <div class="station-dot" data-station="0" onclick="scrollToStation(0)" title="Prologue"></div>
+  <div class="station-dot" data-station="1" onclick="scrollToStation(1)" title="I. The Desert"></div>
+  <div class="station-dot" data-station="2" onclick="scrollToStation(2)" title="II. The Video"></div>
+  <div class="station-dot" data-station="3" onclick="scrollToStation(3)" title="III. The Healing"></div>
+  <div class="station-dot" data-station="4" onclick="scrollToStation(4)" title="IV. The Sermon"></div>
+  <div class="station-dot" data-station="5" onclick="scrollToStation(5)" title="V. The Hearing"></div>
+  <div class="station-dot" data-station="6" onclick="scrollToStation(6)" title="VI. The Last Night"></div>
+  <div class="station-dot" data-station="7" onclick="scrollToStation(7)" title="VII. The Departure"></div>
+  <div class="station-dot" data-station="8" onclick="scrollToStation(8)" title="Coda"></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main-content">
+
+  <!-- EPIGRAPH -->
+  <div class="epigraph" data-station-index="0" id="station-0">
+    <div class="epigraph-text">
+      "He came to his own, and his own people did not receive him."
+    </div>
+    <div class="epigraph-source">John 1:11 — written approximately 90 CE</div>
+
+    <div style="margin-top: 4em; font-family: 'Cormorant Garamond', serif; font-size:0.85rem; color: var(--ash); letter-spacing: 0.1em; line-height: 2;">
+      What follows is a work of speculative theological fiction.<br>
+      It contains truths that are not facts<br>
+      and facts that are not comfortable.<br>
+      You may weep. You are supposed to weep.<br>
+      That is the oldest of permissions.
+    </div>
+
+    <div class="scroll-caret" style="margin-top:3em; opacity:0.3; animation: caretFade 2s ease-in-out infinite;">↓</div>
+  </div>
+
+  <!-- STATION I: THE DESERT -->
+  <div class="station station-desert" id="station-1">
+    <div class="station-header">
+      <div class="station-number">Station I</div>
+      <div class="divider-line"></div>
+      <div class="station-title">The Desert</div>
+      <div class="station-subtitle">Chihuahuan · February · 4:47 a.m.</div>
+    </div>
+
+    <div class="prose-block">
+      <p>He came out of the Chihuahuan on a Tuesday in February, the kind of cold that bites without apologizing, walking the dry bed of the Rio Bravo where it had been fenced three times over. No pack. No phone. Sandals that had no business on that caliche. A robe the color of undyed wool.</p>
+      <p>He had, of course, crossed this river before. The water had been lower then. The stars had been the same.</p>
+    </div>
+
+    <div class="prose-block">
+      <p>A Border Patrol agent named Cody Reyes — twenty-six, third generation Texan, Catholic on Christmas and Easter — spotted him on the thermal drone feed at 4:47 a.m. He radioed in. <em>Single male. No group. Walking like he's got somewhere to be.</em></p>
+      <p>They brought him in easy. He didn't run. He just looked at Cody with eyes that made Cody feel, for a reason he couldn't name in the report, like he had been seen all the way down to the place he'd buried his brother's memory.</p>
+    </div>
+
+    <div class="horror-document" id="intake-form">
+      <div class="doc-title">I-213 — RECORD OF DEPORTABLE/INADMISSIBLE ALIEN</div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Family Name</span><span class="field-value">BARYOSEF</span></div>
+        <div class="field"><span class="field-label">Given Name</span><span class="field-value">JOSHUA</span></div>
+        <div class="field"><span class="field-label">Middle Name</span><span class="field-value">—</span></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Date of Birth</span><span class="field-value">~4 BCE (DISPUTED)</span></div>
+        <div class="field"><span class="field-label">Country of Birth</span><span class="field-value">ROMAN-OCCUPIED JUDEA (DEFUNCT)</span></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Passport / ID</span><span class="field-value">NONE PRESENTED</span></div>
+        <div class="field"><span class="field-label">Visa Status</span><span class="field-value">NONE</span></div>
+        <div class="field"><span class="field-label">Criminal History</span><span class="field-value">NO MATCH FOUND</span></div>
+      </div>
+      <div class="field-row" style="margin-top: 1em;">
+        <div class="field" style="flex:2;"><span class="field-label">Agent Notes</span>
+        <span class="field-value" style="display:block; margin-top: 6px; color: #5a7a8a; font-size:0.72rem;">Subject cooperative. No documentation. Stated name: Yeshua bar Yosef. Pronunciation: Aramaic. Other detainees in adjacent holding appeared calm following subject's presence. One detainee (Guatemalan national, see file 9847-B) reported subject "listened to everything, even the parts I didn't say out loud." No further anomalies noted.</span></div>
+      </div>
+      <div class="stamp" id="intake-stamp">DETAINED</div>
+    </div>
+
+    <div class="sacred-dialogue">
+      <div class="dialogue-line">
+        <div class="speaker cold">AGENT REYES</div>
+        <div class="dialogue-text">Name.</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker divine">THE MAN</div>
+        <div class="dialogue-text divine-words">Yeshua bar Yosef.</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker cold">AGENT REYES</div>
+        <div class="dialogue-text"><em>(writes: Joshua Baryosef)</em> Country of origin?</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker divine">THE MAN</div>
+        <div class="dialogue-text divine-words">The same as yours.</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker cold">AGENT REYES</div>
+        <div class="dialogue-text"><em>(long pause)</em> I need a country, sir.</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker divine">THE MAN</div>
+        <div class="dialogue-text divine-words">I know. I'm sorry that you do.</div>
+      </div>
+    </div>
+
+    <div class="prose-block">
+      <p>He spent the night talking to the other men in adjacent cells. A Guatemalan bricklayer named Miguel who was trying to reach his daughter in Houston. A Congolese pastor named Emmanuel who had been waiting fourteen months for his asylum hearing. He listened to them the way no one had listened to them in years — which is to say: <em>entirely.</em> Like they were the only thing in the universe worth hearing.</p>
+      <p>By morning, Miguel was weeping and laughing at the same time, and couldn't explain why. Emmanuel said that the man had prayed with him in a language Emmanuel didn't recognize, and that it had nevertheless been exactly the right prayer.</p>
+    </div>
+  </div>
+
+  <!-- STATION II: THE VIDEO -->
+  <div class="station station-video" id="station-2">
+    <div class="station-header">
+      <div class="station-number">Station II</div>
+      <div class="divider-line"></div>
+      <div class="station-title">The Video</div>
+      <div class="station-subtitle">six million views · twelve hours</div>
+    </div>
+
+    <div class="prose-block">
+      <p>A detention center staffer — twenty-two, bored, TikTok-brained — filmed through the cell window. Not maliciously. Just because something felt different about this man, the way the other detainees gathered around him like iron filings toward a magnet.</p>
+      <p>She posted it with the caption: <em style="color:var(--cold);">this man radiates idk what</em></p>
+      <p>By noon it had six million views.</p>
+    </div>
+
+    <div class="prose-block">
+      <p>Someone ran facial recognition against Renaissance paintings. The algorithm — the same algorithm used by Clearview AI to track protesters in 2020 — returned a <span class="gold-text">94.7% match</span> to the Pantokrator mosaic from the Hagia Sophia.</p>
+      <p>Twitter became an eschatological thunderdome. Each side so certain. Each side so wrong about why.</p>
+    </div>
+
+    <div class="horror-tweet revealed" style="opacity:1; transform: none;">
+      <div class="tweet-author">🇺🇸 Donald J. Trump  @realDonaldTrump</div>
+      <div class="tweet-text">Another <span class="caps">ILLEGAL ALIEN</span> trying to make headlines. Our <span class="caps">GREAT</span> Border Patrol is doing their job. No one gets a free pass. <span class="caps">NOT EVEN "JESUS" (LOL!)</span> The Radical Left will use ANYONE to push open borders. <span class="caps">NOT ON MY WATCH!</span></div>
+      <div class="tweet-metrics">
+        <span>♻ 284K Reposts</span>
+        <span class="metric-like">♥ 600,411 Likes</span>
+        <span style="color:var(--ash);">11:43 PM · Feb 11, 2026</span>
+      </div>
+    </div>
+
+    <div class="prose-block">
+      <p>On Fox, they ran the chyron: <span class="blood-text">MIGRANT CLAIMING TO BE JESUS DETAINED AT SOUTHERN BORDER</span>. The panel agreed this was either a mental health crisis or a political stunt.</p>
+      <p>On MSNBC, they called three theologians who used the segment to explain why the Second Coming would almost certainly be metaphorical. They seemed relieved by this conclusion.</p>
+      <p>Franklin Graham said: <em>"Real Christians know that Jesus returns in glory with the armies of heaven, not sneaking across our border like a criminal. This is a deception."</em> He was photographed that afternoon having lunch with two senators.</p>
+    </div>
+
+    <div class="prose-block">
+      <p>Pastor Robert Jeffress of First Baptist Dallas — the man who had stood at the steps of the White House and called the President <em>a champion of Christian values</em> — said on his podcast: <em>"The Bible is clear. Test every spirit. The Enemy is a master counterfeiter."</em></p>
+      <p class="gold-text" style="font-family: 'IM Fell English', serif; font-style: italic;">He did not go to the facility. He did not look at the man.</p>
+      <p>That sentence contains the whole of it. Every century. Every betrayal. That sentence is a nail.</p>
+    </div>
+  </div>
+
+  <!-- STATION III: THE HEALING -->
+  <div class="station station-healing" id="station-3">
+    <div class="station-header">
+      <div class="station-number">Station III</div>
+      <div class="divider-line"></div>
+      <div class="station-title">The Healing</div>
+      <div class="station-subtitle">Patricia · I-10 · between Eagle Pass and San Antonio</div>
+    </div>
+
+    <div class="prose-block">
+      <p>On day three, they transferred him. A guard named Patricia Huerta was driving the transport van with a migraine so severe she'd taken four Excedrin and they hadn't touched it. She'd had them since her car accident in 2019. Seventeen months of neurologists and nothing. Seventeen months of her world ending behind her eyes every few days, her children learning to read the shape of her face.</p>
+    </div>
+
+    <div class="sacred-dialogue">
+      <div class="dialogue-line">
+        <div class="speaker divine">THE MAN</div>
+        <div class="dialogue-text divine-words">Are you in pain?</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker cold">PATRICIA HUERTA</div>
+        <div class="dialogue-text">Head. <em>(to the rearview mirror, not looking at him)</em></div>
+      </div>
+      <div class="dialogue-line" style="border-bottom: none;">
+        <div class="speaker" style="min-width:100px;"> </div>
+        <div class="dialogue-text" style="color:var(--ash); font-size:0.85rem; font-family:'Cormorant Garamond', serif; font-style:italic;">He said something quiet. She felt it pass through the back of her skull like warm water through a closed fist, the fist opening.</div>
+      </div>
+    </div>
+
+    <div class="kenosis-text" id="healing-moment">
+      The migraine was gone.
+    </div>
+
+    <div class="sacred-dialogue">
+      <div class="dialogue-line">
+        <div class="speaker cold">PATRICIA</div>
+        <div class="dialogue-text"><em>(pulled over on I-10, hands on the wheel, not moving)</em> What did you do.</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker divine">THE MAN</div>
+        <div class="dialogue-text divine-words">What I was asked to do.</div>
+      </div>
+    </div>
+
+    <div class="prose-block">
+      <p>Patricia Huerta went home that night and told her husband, who told his brother, who worked at KSAT. By the next morning there were two news vans outside the detention center and a crowd of sixty people holding signs — some that said <em>FREE JESUS</em>, some that said <em>ANTICHRIST DETECTED</em>, some that said <em>JOHN 3:16</em> without apparent awareness of the irony.</p>
+    </div>
+
+    <div class="horror-tweet revealed" style="opacity:1; transform: none; border-left-color: var(--steel);">
+      <div class="tweet-author">Southern Poverty Law Center @splcenter</div>
+      <div class="tweet-text" style="color: #7a9aaa;">SPLC is monitoring reports of a detained individual making messianic claims and allegedly performing "healings" at the Eagle Pass ICE facility. We urge the public to exercise caution regarding the exploitation of vulnerable migrants by those seeking to advance religious narratives. 🧵1/7</div>
+      <div class="tweet-metrics">
+        <span>♻ 12K Reposts</span>
+        <span class="metric-like">♥ 34,100 Likes</span>
+        <span style="color:var(--ash);">7:22 AM · Feb 12, 2026</span>
+      </div>
+    </div>
+
+    <div class="horror-tweet revealed" style="opacity:1; transform: none; border-left-color: var(--ash); margin-top:-1em;">
+      <div class="tweet-author">The Vatican Press Office @VaticanNews</div>
+      <div class="tweet-text" style="color: #7a9aaa;">The Holy See is monitoring the situation in Eagle Pass, Texas and will provide guidance in due course. The faithful are encouraged to pray for discernment. <em>Omnia probate; quod bonum est tenete.</em> (1 Thess 5:21)</div>
+      <div class="tweet-metrics">
+        <span>♻ 8K Reposts</span>
+        <span class="metric-like">♥ 19,400 Likes</span>
+        <span style="color:var(--ash);">9:01 AM · Feb 12, 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATION IV: THE SERMON -->
+  <div class="station station-sermon" id="station-4">
+    <div class="station-header">
+      <div class="station-number">Station IV</div>
+      <div class="divider-line"></div>
+      <div class="station-title">The Sermon</div>
+      <div class="station-subtitle">Alamo Plaza · San Antonio · February 14 · Valentine's Day</div>
+    </div>
+
+    <div class="prose-block">
+      <p>They released him. They had to. No criminal record. No warrants. Deportation proceedings initiated — he'd been served a notice to appear before an immigration judge in sixty days. He was given a bus ticket to San Antonio and a phone number for a nonprofit.</p>
+      <p>He did not take the bus.</p>
+      <p>He walked to Alamo Plaza and sat on a low wall near the cenotaph and began to speak. Not loudly. Not performing. The way you speak when you have something that needs saying and you trust that the people who need to hear it will come close enough.</p>
+      <p>They did. They always do. That, too, is the oldest story.</p>
+    </div>
+
+    <div class="sacred-verse">
+      <em>A Dominican seminarian named Clara, who had studied Aramaic for eight years, translated in real time. Her hands were shaking. She translated everything. She missed nothing. She would remember every word of it for the rest of her life, which would be long and full of consequence.</em>
+    </div>
+
+    <div class="sacred-verse" id="beatitudes-block">
+      <span class="beatitude">Blessed are the ones who have nothing. The kingdom belongs to them.</span>
+      <span class="beatitude">Blessed are those who are grieving. They will be held.</span>
+      <span class="beatitude">Blessed are those who have been stepped on. They will inherit the earth.</span>
+      <span class="beatitude">Blessed are those starving for justice. They will be filled.</span>
+      <span class="beatitude">Blessed are those who show mercy. God will be merciful to them.</span>
+      <span class="beatitude">Blessed are those whose hearts are clean. They will see God.</span>
+      <span class="beatitude">Blessed are those who make peace. They are God's children.</span>
+      <span class="beatitude" style="color: var(--crimson);">Blessed are those being hunted down for doing right. The kingdom is already theirs.</span>
+    </div>
+
+    <div class="prose-block">
+      <p>The crowd was silent. Four hundred people, phones recording, and the only sound was wind and distant traffic and one man somewhere who had begun, softly, to sob.</p>
+    </div>
+
+    <div class="prose-block">
+      <p>Then he looked at them and said: <span class="gold-text" style="font-family:'IM Fell English', serif; font-style:italic;">You have heard it said: love your neighbor. But I'm telling you — love your enemy. Pray for the people who hate you. Do good to those who hunt you. If someone takes your coat, give them your shirt too. Give to anyone who asks. Don't turn away.</span></p>
+    </div>
+
+    <div class="sacred-dialogue">
+      <div class="dialogue-line">
+        <div class="speaker cold">A MAN IN A MAGA HAT</div>
+        <div class="dialogue-text blood-text"><em>(from the back)</em> That's communism!</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker divine">THE MAN</div>
+        <div class="dialogue-text divine-words">Come closer. Tell me your name.</div>
+      </div>
+      <div class="dialogue-line" style="border-bottom: none;">
+        <div class="speaker" style="min-width:100px;"></div>
+        <div class="dialogue-text" style="color: var(--ash); font-size:0.87rem; font-style:italic;">The man's name was Gary. He'd driven from Corpus Christi. His son had died of fentanyl three years ago and he had been so angry for so long he had forgotten he was sad. He walked forward. And in front of four hundred strangers and a live stream, Gary began to cry. Later he would say: <span class="gold-text">"I don't know what happened. I just felt like he already knew everything I'd done wrong and wasn't keeping score."</span></div>
+      </div>
+    </div>
+
+    <div class="horror-tweet revealed" style="opacity:1; transform:none; border-left-color: var(--blood);">
+      <div class="tweet-author">🔥 Charlie Kirk @charliekirk11</div>
+      <div class="tweet-text">Just watched the Alamo Plaza "sermon." Classic left-wing manipulation. Emotional crowd, immigrants, crying men, OPEN BORDERS talking points dressed up in religious language. Don't be deceived. Real Christianity defends borders. <span class="caps">GOD IS NOT A SOCIALIST.</span> 🧵</div>
+      <div class="tweet-metrics">
+        <span>♻ 89K Reposts</span>
+        <span class="metric-like">♥ 341,000 Likes</span>
+      </div>
+    </div>
+
+    <div class="prose-block">
+      <p>The clip of Gary crying went viral. People used it as a punchline. <em>Even the MAGA guy couldn't resist lol.</em></p>
+      <p class="gold-text" style="font-family:'IM Fell English',serif; font-style:italic; font-size:1.05rem;">They missed the point. They always miss the point. That is, perhaps, the oldest story.</p>
+    </div>
+  </div>
+
+  <!-- STATION V: THE HEARING -->
+  <div class="station station-hearing" id="station-5">
+    <div class="station-header">
+      <div class="station-number">Station V</div>
+      <div class="divider-line"></div>
+      <div class="station-title">The Hearing</div>
+      <div class="station-subtitle">Immigration Court · San Antonio · March 15</div>
+    </div>
+
+    <div class="prose-block">
+      <p>His immigration court date was March 15th. The ACLU took his case pro bono. ICE had flagged him as a <em>Person of Interest</em> after the Alamo Plaza sermon — specifically, the line about giving your coat, which a DHS analyst had tagged as <span class="blood-text">potentially anti-property-rights rhetoric</span>, and the line about loving your enemy, which had been cross-referenced with concerns about <span class="blood-text">undermining national security posture.</span></p>
+    </div>
+
+    <div class="horror-document" id="dhs-flag">
+      <div class="doc-title">DHS PERSON OF INTEREST ASSESSMENT — INTERNAL ROUTING</div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Subject</span><span class="field-value">BARYOSEF, JOSHUA</span></div>
+        <div class="field"><span class="field-label">Risk Level</span><span class="field-value" style="color:#9b3333;">ELEVATED — MONITOR</span></div>
+      </div>
+      <div style="margin-top:1.2em; color:#5a7a8a; font-size:0.72rem; line-height:1.8;">
+        <strong style="color:var(--cold);">Flagged Statements:</strong><br>
+        [1] "Give to anyone who asks. Don't turn away." — Potential anti-CBP messaging, welfare state advocacy.<br>
+        [2] "Love your enemy. Do good to those who hunt you." — Possible attempt to undermine ICE/law enforcement cooperation.<br>
+        [3] "The meek shall inherit the earth." — Cross-referenced: Marxist redistribution rhetoric. See: Bureau of Counterterrorism file #CT-2026-0448.<br>
+        [4] "Blessed are those being hunted down for doing right." — Possible incitement. Crowd size: 400+. Live-streamed.
+        <br><br>
+        <strong style="color:var(--cold);">Assessment:</strong> Subject demonstrates sophisticated ability to generate emotional mass compliance using religiously-coded language. Potential influence operation cannot be ruled out. Recommend expedited removal proceedings.
+      </div>
+      <div class="stamp" id="dhs-stamp">CONFIDENTIAL</div>
+    </div>
+
+    <div class="prose-block">
+      <p>His attorney — a small Salvadoran-American woman named Maria José Fuentes who had been doing this work for nineteen years and had seen everything — asked him before they went in: <em>"Do you understand what might happen today?"</em></p>
+      <p>He said: <span class="gold-text" style="font-family:'IM Fell English',serif; font-style:italic;">Yes.</span></p>
+      <p>She said: <em>"Are you afraid?"</em></p>
+      <p>He looked at her with that look. The one that went all the way down.</p>
+      <p class="gold-text" style="font-family:'IM Fell English',serif; font-style:italic; font-size:1.05rem;">I have done this before.</p>
+    </div>
+
+    <div class="prose-block">
+      <p>The judge — a man named Richard Alderman, appointed in 2019, who went to Lakewood Church on Sundays and had a framed verse from Romans above his bench — looked at the case before him. Undocumented entry. No valid identification. No country of recognized legal origin. No proof of citizenship anywhere on earth.</p>
+      <p>He looked at the man across the courtroom.</p>
+      <p>The man looked back.</p>
+      <p>Alderman felt something he would not describe to anyone for six months, and when he finally described it to his wife, he would say: <span class="gold-text" style="font-family:'IM Fell English',serif; font-style:italic;">"It was like being asked a question I didn't know I'd spent my whole life failing to answer."</span></p>
+    </div>
+
+    <div class="sign-block" id="sign-block">
+      <span class="sign-label">Immigration Court — Case No. 2026-SAN-009144<br>DEPORTATION ORDER — JUDGE'S SIGNATURE</span>
+      <p style="font-family:'IM Fell English',serif; font-style:italic; color:var(--ash); font-size:0.9rem; margin-bottom:1.5em;">The judge approved the deportation order. Yeshua bar Yosef, also known as Joshua Baryosef, was to be removed from the United States within thirty days.</p>
+      <p style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.15em; color:var(--steel); margin-bottom:1.5em;">You too are here, in this moment. What would you have done?</p>
+      <input type="text" class="sign-input" id="name-input" placeholder="Enter your name to sign the order">
+      <button class="sign-btn" onclick="signOrder()">APPROVE DEPORTATION ORDER</button>
+      <div class="sign-consequence" id="sign-consequence"></div>
+    </div>
+  </div>
+
+  <!-- STATION VI: THE LAST NIGHT -->
+  <div class="station station-lastnight" id="station-6">
+    <div class="station-header">
+      <div class="station-number">Station VI</div>
+      <div class="divider-line"></div>
+      <div class="station-title">The Last Night</div>
+      <div class="station-subtitle">AME Church · East Side, San Antonio · March 14</div>
+    </div>
+
+    <div class="prose-block">
+      <p>The night before they came for him, he was in a church. Not the kind with a Jumbotron, not the kind with a bookstore in the lobby and a pastor with a Netflix deal. A small AME church on the east side of San Antonio. Mostly elderly Black women. A few young men. Cracked pews. A ceiling fan that wobbled. A piano slightly out of tune, which is the best kind.</p>
+    </div>
+
+    <div class="kenosis-text">
+      He washed feet.
+    </div>
+
+    <div class="footwash-scene" id="footwash">
+      <div class="footwash-person" id="fw-1">
+        <div class="person-name">DOROTHEA, 81</div>
+        <div class="person-burden">Has cleaned other people's houses since she was sixteen. Has prayed for sixty-five years into a sky that answers quietly.</div>
+      </div>
+      <div class="footwash-person" id="fw-2">
+        <div class="person-name">ANDRE, 33</div>
+        <div class="person-burden">Shot twice. Survived. Wasn't sure what for, until that night.</div>
+      </div>
+      <div class="footwash-person" id="fw-3">
+        <div class="person-name">CLARA</div>
+        <div class="person-burden">The seminarian. Gave up a tenure-track offer to translate for a man she couldn't fully explain to herself. Wept when he reached her feet.</div>
+      </div>
+      <div class="footwash-person" id="fw-4">
+        <div class="person-name">EMMANUEL</div>
+        <div class="person-burden">Fourteen months in detention. A pastor. Still preaching.</div>
+      </div>
+      <div class="footwash-person" id="fw-5">
+        <div class="person-name">MIGUEL'S DAUGHTER</div>
+        <div class="person-burden">She came from Houston. Her father could not be there. She brought his photograph.</div>
+      </div>
+    </div>
+
+    <div class="prose-block">
+      <p>When he got to Clara, she said: <em>"Lord, you don't have to —"</em></p>
+      <p>He said: <span class="gold-text" style="font-family:'IM Fell English',serif; font-style:italic; font-size:1.05rem;">Let me serve you. That's why I'm here.</span></p>
+      <p>She couldn't speak for a long time.</p>
+    </div>
+
+    <div class="prose-block">
+      <p>Later, they ate together. Someone had brought tamales. He broke bread and passed it. He passed a cup. He said, very quietly: <span class="gold-text" style="font-family:'IM Fell English',serif; font-style:italic;">Every time you do this, remember me.</span></p>
+      <p>Dorothea, who had a memory like a steel trap and had been reading her Bible every morning for sixty-five years, began to shake.</p>
+    </div>
+
+    <div class="sacred-dialogue">
+      <div class="dialogue-line">
+        <div class="speaker" style="color: var(--gold);">DOROTHEA</div>
+        <div class="dialogue-text"><em>(gripping his hand with both of hers)</em> It's really you.</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker divine">THE MAN</div>
+        <div class="dialogue-text divine-words">It's really me.</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker" style="color: var(--gold);">DOROTHEA</div>
+        <div class="dialogue-text">What are we going to do?</div>
+      </div>
+      <div class="dialogue-line">
+        <div class="speaker divine">THE MAN</div>
+        <div class="dialogue-text divine-words" style="font-size:1.1rem; color: var(--bone);">You're going to keep going. After I'm gone, you're going to keep going. That's always been the plan. I never needed to be here to build the kingdom. I needed you to know you could.</div>
+      </div>
+    </div>
+
+    <div class="prose-block">
+      <p>She wept so hard she couldn't breathe. He held her. The oldest arms in the world. He let her get it all out.</p>
+      <p>Outside, on the news, a commentator was explaining why the deportation was legally sound and logistically necessary. <em>"Rule of law,"</em> he said. <em>"Rule of law."</em></p>
+    </div>
+
+    <div class="horror-tweet revealed" style="opacity:1; transform:none; border-left-color: var(--steel);">
+      <div class="tweet-author">Pastor Robert Jeffress @robertjeffress</div>
+      <div class="tweet-text"><em>"Beloved, do not believe every spirit, but test the spirits to see whether they are from God, because many false prophets have gone out into the world."</em> — 1 John 4:1. Discernment, beloved. Discernment. 🙏</div>
+      <div class="tweet-metrics">
+        <span>♻ 44K Reposts</span>
+        <span class="metric-like">♥ 188,000 Likes</span>
+        <span style="color:var(--ash);">10:17 PM · March 14, 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATION VII: THE DEPARTURE -->
+  <div class="station station-departure" id="station-7">
+    <div class="station-header">
+      <div class="station-number">Station VII</div>
+      <div class="divider-line"></div>
+      <div class="station-title glitch" data-text="The Departure">The Departure</div>
+      <div class="station-subtitle">San Antonio International · 5:00 a.m. · March 15</div>
+    </div>
+
+    <div class="prose-block">
+      <p>They came at 5 a.m., the way they always come. Four ICE agents. Professional. Not cruel — which is almost worse, somehow, than cruelty. They were doing their jobs. One of them had a daughter named Sophie. One of them had a mortgage. One of them had a small wooden cross on his keychain that swung when he walked.</p>
+    </div>
+
+    <div class="prose-block">
+      <p>He went with them without resistance.</p>
+      <p>At the airport, there was a crowd — three hundred people who had heard, who had come in the dark, who held candles and wept and prayed and sang.</p>
+    </div>
+
+    <div class="sacred-verse" style="border-left-color: var(--crimson); background: rgba(122,15,15,0.04);">
+      <em>Were you there when they crucified my Lord?</em><br>
+      <span style="font-size:0.85rem; color:var(--ash);">The old song. Dorothea's voice — cracked and enormous — leading them in the airport terminal at five in the morning, her breath a small cloud in the February air. They had no permit to gather. They gathered anyway.</span>
+    </div>
+
+    <div class="hand-on-glass" id="hand-glass">
+      <span class="hand-symbol">✋</span>
+      <div class="hand-text">
+        He saw them through the terminal glass.<br>
+        He pressed his hand against it.<br>
+        <br>
+        <span style="color: var(--gold); font-size:1.2rem;">Three hundred hands pressed back.</span>
+        <br><br>
+        <span style="color: var(--ash); font-size:0.9rem; font-style:italic;">The glass between them was cold.</span>
+      </div>
+    </div>
+
+    <div class="prose-block">
+      <p>He was loaded onto a deportation flight. Destination: undefined, because there was no country that would formally claim him. The plane would circle. It always circles.</p>
+    </div>
+
+    <div class="prose-block">
+      <p>Clara, watching the plane taxi, said to Maria José: <em>"What do we do now?"</em></p>
+      <p>Maria José, who had seen everything, who had cried herself empty years ago and kept working anyway, said: <em>"What he said. We keep going."</em></p>
+      <p><em>"But he's gone,"</em> Clara said.</p>
+      <p class="gold-text" style="font-family:'IM Fell English',serif; font-style:italic; font-size:1.1rem;">He's been gone before. Look what happened.</p>
+    </div>
+
+    <div class="horror-tweet revealed" style="opacity:1; transform:none; border-left-color:var(--blood); margin-top: 2em;">
+      <div class="tweet-author">🇺🇸 Donald J. Trump @realDonaldTrump</div>
+      <div class="tweet-text">Another <span class="caps">WIN</span> for <span class="caps">BORDER SECURITY!</span> The rule of law is back! <span class="caps">AMERICA FIRST!</span> Our great ICE agents did their job. No one is above the law. <span class="caps">NO ONE!</span> 🇺🇸🦅🇺🇸</div>
+      <div class="tweet-metrics">
+        <span>♻ 301K Reposts</span>
+        <span class="metric-like">♥ 812,400 Likes</span>
+        <span style="color:var(--ash);">6:44 AM · March 15, 2026</span>
+      </div>
+    </div>
+
+    <div class="prose-block" style="margin-top: 4em;">
+      <p>The Jumbotron churches did not cover the deportation. They had a sermon series on financial freedom scheduled through Easter.</p>
+      <p>The cross on the ICE agent's keychain swung all the way home.</p>
+      <p>Pastor Jeffress posted a verse from Matthew 24. The one about false prophets. He did not specify which false prophet he meant. He did not need to. Ambiguity had always been his most faithful instrument.</p>
+    </div>
+  </div>
+
+  <!-- CODA -->
+  <div class="coda" id="station-8">
+    <div class="coda-cross"></div>
+
+    <div class="coda-verse">
+      Dorothea sat in her cracked pew, in the empty church, for two hours after the others left.<br>
+      She was not crying anymore. She was past crying.<br>
+      She was somewhere older than crying —<br>
+      <em>in the country that grief becomes when it has finished becoming.</em><br><br>
+
+      She opened her Bible to the Beatitudes.<br>
+      She read them again. Then again.<br><br>
+
+      Then she put on her coat<br>
+      and went out into the February morning<br>
+      to clean someone else's house —<br>
+      <span style="color:var(--gold);">because that was the work, and the work didn't wait,</span><br>
+      and she was a woman who had always known<br>
+      that <em>resurrection is not an event.</em><br><br>
+      <span class="coda-line-blood">It's a practice.</span>
+    </div>
+
+    <div class="coda-final" id="coda-final-text">
+      AND THE WORD BECAME FLESH AND DWELT AMONG US<br>
+      AND WE PROCESSED HIM EFFICIENTLY<br>
+      AND DEPORTED HIM WITHIN THE LEGALLY MANDATED WINDOW<br><br>
+      AND THE LIGHT SHINES IN THE DARKNESS<br>
+      <span style="color: var(--blood);">AND THE DARKNESS HAS A VERY GOOD LEGAL TEAM</span>
+    </div>
+
+    <div class="coda-signature" id="coda-sig">
+      Glory be to the Father, and to the Son, and to the Holy Spirit,<br>
+      world without end —<br>
+      <em>if we let it.</em>
+    </div>
+
+    <div style="margin-top: 100px; text-align:center; opacity:0; transition: opacity 3s ease 3s;" id="final-prompt">
+      <div style="font-family:'Cinzel', serif; font-size:0.65rem; letter-spacing:0.4em; color: var(--ash);">
+        — FINIS —
+      </div>
+      <div style="font-family:'IM Fell English', serif; font-style:italic; color:var(--ash); font-size:0.8rem; margin-top:2em; opacity:0.6;">
+        Share this with someone who needs to weep.<br>
+        Then go do the work.
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main-content -->
+
+<script>
+// ─── PARTICLE SYSTEM ───────────────────────────────────────────────────────
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height + 10;
+    this.size = Math.random() * 1.5 + 0.3;
+    this.speedY = -(Math.random() * 0.6 + 0.2);
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.opacity = Math.random() * 0.4 + 0.1;
+    this.life = 0;
+    this.maxLife = Math.random() * 300 + 200;
+    // Color: gold, crimson, or ash
+    const r = Math.random();
+    if (r < 0.6) this.color = `rgba(201,162,39,${this.opacity})`;
+    else if (r < 0.8) this.color = `rgba(122,15,15,${this.opacity * 0.6})`;
+    else this.color = `rgba(120,110,96,${this.opacity * 0.5})`;
+  }
+  update() {
+    this.x += this.speedX + Math.sin(this.life * 0.02) * 0.3;
+    this.y += this.speedY;
+    this.life++;
+    if (this.life > this.maxLife || this.y < -10) this.reset();
+  }
+  draw() {
+    const alpha = this.life < 30 ? this.life / 30 :
+                  this.life > this.maxLife - 30 ? (this.maxLife - this.life) / 30 : 1;
+    ctx.globalAlpha = alpha * this.opacity;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 80; i++) {
+  const p = new Particle();
+  p.y = Math.random() * canvas.height; // scatter initial positions
+  p.life = Math.random() * p.maxLife;
+  particles.push(p);
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ─── TITLE SCREEN ──────────────────────────────────────────────────────────
+function beginNarrative() {
+  const ts = document.getElementById('title-screen');
+  ts.classList.add('dissolving');
+  setTimeout(() => {
+    ts.style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    setupObservers();
+    updateProgress();
+  }, 2000);
+}
+
+// ─── SCROLL OBSERVERS ──────────────────────────────────────────────────────
+function setupObservers() {
+  const revealTargets = document.querySelectorAll(
+    '.prose-block, .sacred-verse, .horror-document, .horror-tweet, .sacred-dialogue, .kenosis-text, .footwash-scene, .hand-on-glass, .sign-block, .epigraph, .coda-verse, .coda-final, .coda-signature'
+  );
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        triggerSpecialEffects(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+  revealTargets.forEach(el => observer.observe(el));
+
+  // Footwash children
+  const footwashObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        triggerFootwash();
+        footwashObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  const fw = document.getElementById('footwash');
+  if (fw) footwashObs.observe(fw);
+}
+
+function triggerSpecialEffects(el) {
+  // Stamp the intake form
+  if (el.id === 'intake-form') {
+    setTimeout(() => {
+      const stamp = document.getElementById('intake-stamp');
+      if (stamp) stamp.classList.add('stamped');
+    }, 800);
+  }
+  // Stamp DHS flag
+  if (el.id === 'dhs-flag') {
+    setTimeout(() => {
+      const stamp = document.getElementById('dhs-stamp');
+      if (stamp) stamp.classList.add('stamped');
+    }, 600);
+  }
+  // Coda final text
+  if (el.id === 'coda-final-text') {
+    setTimeout(() => {
+      document.getElementById('coda-sig').classList.add('revealed');
+      setTimeout(() => {
+        const fp = document.getElementById('final-prompt');
+        if (fp) fp.style.opacity = '1';
+      }, 3000);
+    }, 2000);
+  }
+}
+
+function triggerFootwash() {
+  const fw = document.getElementById('footwash');
+  if (fw) fw.classList.add('revealed');
+  const people = ['fw-1','fw-2','fw-3','fw-4','fw-5'];
+  people.forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('washed');
+    }, i * 600 + 400);
+  });
+}
+
+// ─── PROGRESS BAR + STATION DOTS ───────────────────────────────────────────
+const stationEls = ['station-0','station-1','station-2','station-3','station-4','station-5','station-6','station-7','station-8'];
+
+function updateProgress() {
+  const scrollY = window.scrollY;
+  const docH = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = Math.min(100, (scrollY / docH) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+
+  stationEls.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const dot = document.querySelector(`.station-dot[data-station="${i}"]`);
+    if (!dot) return;
+    if (rect.top < window.innerHeight * 0.5 && rect.bottom > 0) {
+      dot.classList.add('active');
+      dot.classList.remove('passed');
+    } else if (rect.bottom < window.innerHeight * 0.5) {
+      dot.classList.remove('active');
+      dot.classList.add('passed');
+    } else {
+      dot.classList.remove('active','passed');
+    }
+  });
+}
+
+window.addEventListener('scroll', updateProgress);
+
+function scrollToStation(i) {
+  const el = document.getElementById(stationEls[i]);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── SIGN ORDER ─────────────────────────────────────────────────────────────
+function signOrder() {
+  const name = document.getElementById('name-input').value.trim();
+  const el = document.getElementById('sign-consequence');
+  if (!name) {
+    el.textContent = 'You must enter your name.';
+    el.classList.remove('condemned');
+    return;
+  }
+  el.classList.add('condemned');
+  el.innerHTML = `<em>${name}</em> has signed the order.<br><br>As have all of us, in our silence.<br>As have all of us, in our comfort.<br>As have all of us who did not go.`;
+
+  // Add a brief flash of horror
+  document.body.style.transition = 'background 0.2s';
+  document.body.style.background = '#0d0202';
+  setTimeout(() => { document.body.style.background = ''; }, 400);
+}
+
+// ─── KEYBOARD SHORTCUT ──────────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  const ts = document.getElementById('title-screen');
+  if (ts && ts.style.display !== 'none' && !ts.classList.contains('dissolving')) {
+    beginNarrative();
+  }
+});
+</script>
+</body>
+</html>
