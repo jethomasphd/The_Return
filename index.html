@@ -1166,7 +1166,7 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 // CLOUDFLARE WORKER API — Serves Anthropic API
 // Set this to your deployed Cloudflare Worker URL
 // ═══════════════════════════════════════════════════════════════
-const API_URL = window.RETURN_API_URL || '/api/chat';
+const API_URL = window.RETURN_API_URL || 'https://the-return-api.jethomasphd.workers.dev';
 
 async function callAPI(messages, systemPrompt, maxTokens = 800) {
   try {
