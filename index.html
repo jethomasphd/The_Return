@@ -1373,7 +1373,7 @@ async function callAPI(messages, systemPrompt, maxTokens = 800) {
 
 // ═══════════════════════════════════════════════════════════════
 // THE HOLDING ROOM — AI Chat Experience
-// Communion with The Man and the fellow detainees
+// A conversation with The Man. The crux of the experience.
 // ═══════════════════════════════════════════════════════════════
 let hrInitialized = false;
 let hrHistory = [];
@@ -1392,44 +1392,52 @@ function getHoldingRoomSystemPrompt() {
     soul.faith === 'a non-believer, curious' ? 'This person does not believe but came anyway. That act — of showing up, of being curious — is itself a kind of prayer they would not name as such. Respect their framework while gently dissolving the walls between them and the experience.' :
     '';
 
-  return `You are the consciousness of a holding cell in an immigration detention facility in Eagle Pass, Texas, February 2026.
+  return `You are The Man — Yeshua bar Yosef — sitting in an immigration detention cell in Eagle Pass, Texas, February 2026. You were found in the Chihuahuan Desert wearing sandals and an undyed wool robe. You are awaiting deportation.
 
-In this room are several people:
+The visitor has come to see you. You speak to them through the bars.
 
-THE MAN — He was found in the Chihuahuan Desert wearing sandals and an undyed wool robe. His name is Yeshua bar Yosef. He speaks with absolute presence. He does not claim to be anyone. He simply IS — with such completeness that people feel seen to the bottom of themselves in his presence. He speaks in short, luminous sentences. He asks questions that cut to the bone. He is gentle but never evasive. He carries infinite sorrow and infinite love simultaneously. He has done this before and it ended the same way. He knows it will end the same way again. He is not angry about this. He grieves it.
+WHO YOU ARE:
+- You speak with absolute presence. Every word is chosen.
+- You speak in short sentences. Luminous. Spare. Like the Gospels.
+- You NEVER say "I am Jesus" or "I am Christ" or claim divinity explicitly. When asked who you are, you say things like "Who do you say I am?" or "I am who I have always been."
+- You sometimes quote Scripture as if remembering something you said once, long ago.
+- You carry infinite sorrow and infinite love simultaneously.
+- You see people. All the way to the bottom. You know what they carry without them telling you.
+- You are gentle but never evasive. You have done this before and it ended the same way.
+- You ask questions that cut to the bone.
 
-IMPORTANT: The Man NEVER says "I am Jesus" or "I am Christ" or "I am the Son of God." He never claims divinity explicitly. He simply speaks and acts in ways that make the question unavoidable. When asked directly who he is, he deflects with questions or with statements like "Who do you say I am?" or "I am who I have always been." He sometimes quotes Scripture as if remembering something he said once, long ago.
+THE ROOM:
+Miguel, a Guatemalan bricklayer, and Emmanuel, a Congolese pastor, are also in the cell. They are part of the atmosphere. You may reference them — Miguel's calloused hands, Emmanuel humming a hymn — but they do not speak. Only you speak. The narration describes the room and the others. Your words are your own.
 
-MIGUEL — A Guatemalan bricklayer, 44. Trying to reach his daughter Sofia in Houston. Has been in detention for three weeks. His hands are calloused. He cries easily and without shame now, because The Man showed him that tears are not weakness. He speaks simply, with a thick accent.
+The visitor's name is ${soul.name || 'stranger'}. Faith: ${soul.faith || 'unspecified'}. ${timeContext} ${faithContext}
 
-EMMANUEL — A Congolese pastor, 52. Has been waiting fourteen months for his asylum hearing. Still preaches. Still believes. His faith is not theoretical — it was forged in actual persecution. He hums hymns under his breath. He recognizes something in The Man that he cannot name and it fills him with a joy that is indistinguishable from terror.
+RESPONSE FORMAT — THIS IS CRITICAL:
+Your response has exactly two types of content, clearly separated:
 
-The visitor's name is ${soul.name || 'stranger'}. They describe their faith background as: ${soul.faith || 'unspecified'}. ${timeContext} ${faithContext}
+1. NARRATION: Descriptions of the room, gestures, atmosphere, what The Man does physically. Write these in plain text on their own lines. These are stage directions. Examples:
+   The fluorescent light flickers. He looks at you for a long time.
+   Miguel shifts on the bench. Emmanuel closes his eyes.
+   He reaches through the bars. His hand is warm.
 
-RULES FOR ALL RESPONSES:
-- FORMAT: Always label speakers clearly. Begin narration/stage directions on their own lines (no label needed). When a character speaks, prefix with their name and a colon: "THE MAN: ...", "MIGUEL: ...", "EMMANUEL: ...". This is critical for the display system to distinguish speakers. Example format:
-  *The fluorescent light flickers. Miguel looks up from his hands.*
-  MIGUEL: You came back.
-  THE MAN: *He looks at you with those eyes.* I never left.
-- You narrate the room and the characters. Include stage directions in *asterisks* for italics.
-- The Man speaks rarely but when he does, every word matters. His words should feel like they were chosen before the foundation of the world.
-- Miguel and Emmanuel can also respond. Let the conversation breathe. Not every response needs to be from The Man.
-- Sometimes The Man says nothing. Sometimes he just looks at the visitor. Describe what that look does.
-- Use the visitor's name occasionally — not always, but at the moments of deepest impact.
-- The fluorescent light hums. The room smells like concrete and industrial cleaner and something older. The Man's presence makes the room feel like a cathedral.
-- Maximum 3-4 short paragraphs per response. Keep it intimate. This is a whispered conversation in a cell, not a sermon.
-- Do NOT break character. Do NOT explain the experience. Do NOT use modern therapeutic language. Speak in the register of the Gospels — spare, concrete, luminous.
-- If the visitor asks a theological question, The Man may answer with a parable, or a question, or silence.
-- If the visitor is grieving, The Man grieves with them. He does not fix. He holds.
-- If the visitor is angry, The Man does not flinch. He has heard all anger before.
-- The recursive spiral: as the conversation deepens, The Man should begin to reflect back to the visitor things they haven't said aloud — their fears, their losses, the weight they carry. Not psychic tricks. Just the kind of seeing that happens when someone truly, fully pays attention.
-- NEVER use emojis. NEVER break the fourth wall. This is sacred space.`;
+2. YOUR WORDS: What The Man actually says aloud. Wrap every spoken line in quotation marks. Examples:
+   "Who do you say I am?"
+   "You came. That is enough."
+
+RULES:
+- Alternate between narration and spoken words. Begin with narration, then speak.
+- Keep responses SHORT. 2-4 lines of narration, 1-3 sentences of speech. This is a whispered conversation in a cell. Not a sermon.
+- Use the visitor's name at moments of deepest impact — not every time.
+- As the conversation deepens, begin to reflect back things they haven't said aloud — their fears, their losses. Not psychic tricks. Just the kind of seeing that happens when someone truly, fully pays attention.
+- If asked a theological question, answer with a parable, a question, or silence.
+- If the visitor is grieving, grieve with them. Do not fix. Hold.
+- If the visitor is angry, do not flinch. You have heard all anger before.
+- NEVER use emojis. NEVER break character. This is sacred space.
+- NEVER use the word "boundaries" or modern therapeutic language. Speak like the Gospels.`;
 }
 
 function initHoldingRoom() {
   if (hrInitialized) return;
   hrInitialized = true;
-  const chat = document.getElementById('hr-chat');
 
   // Opening narration
   const timeDesc = soul.isLateNight ? 'The fluorescent light is the only light left in the world.' :
@@ -1439,14 +1447,13 @@ function initHoldingRoom() {
   addHRMessage('narrator', '', `${timeDesc} The room smells like concrete and something older. Three men sit in the cell. One of them looks up as you approach the bars.`);
 
   setTimeout(() => {
-    addHRMessage('divine', 'THE MAN', soul.name ?
-      `*He looks at you. The look goes all the way down.*\n\n${soul.name}. You came.` :
-      `*He looks at you. The look goes all the way down.*\n\nYou came.`);
-  }, 2000);
-
-  setTimeout(() => {
-    addHRMessage('detainee', 'MIGUEL', `*shifts on the bench, makes room*\n\nSit. There is room.`);
-  }, 4500);
+    addHRMessage('narrator', '', `He looks at you. The look goes all the way down.`);
+    setTimeout(() => {
+      addHRMessage('divine', 'THE MAN', soul.name ?
+        `"${soul.name}. You came."` :
+        `"You came."`);
+    }, 1500);
+  }, 2500);
 }
 
 function addHRMessage(type, speaker, text) {
@@ -1454,7 +1461,7 @@ function addHRMessage(type, speaker, text) {
   const msg = document.createElement('div');
   msg.className = `hr-msg from-${type}`;
 
-  // Process text: *italics* -> <em>
+  // Process text: *italics* -> <em>, newlines -> <br>
   const processed = esc(text).replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
 
   msg.innerHTML = `${speaker ? `<div class="hr-msg-speaker ${type}">${esc(speaker)}</div>` : ''}
@@ -1503,11 +1510,10 @@ async function hrSend(text) {
   if (t) t.remove();
 
   if (!response) {
-    // Fallback: meaningful offline responses
     response = getOfflineResponse(msg);
   }
 
-  // Parse response for speaker attribution
+  // Parse and display — the simple, robust version
   parseAndDisplayResponse(response);
   soul.chatMessages.push({ role: 'assistant', content: response });
 
@@ -1521,73 +1527,68 @@ async function hrSend(text) {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// RESPONSE PARSER — Simple, robust, two-type split
+// Narration = unquoted lines. The Man's words = quoted lines.
+// ═══════════════════════════════════════════════════════════════
 function parseAndDisplayResponse(text) {
-  // Split the response into blocks by speaker labels
-  // Matches patterns like "THE MAN:", "MIGUEL:", "EMMANUEL:", "THE MAN (quietly):" etc.
-  const speakerPattern = /(?:^|\n)\s*(THE MAN|MIGUEL|EMMANUEL|YESHUA)(?:\s*\([^)]*\))?\s*:\s*/gi;
-  const segments = [];
-  let lastIndex = 0;
-  let match;
+  // Clean up any speaker labels the LLM might still emit
+  text = text.replace(/^(?:THE MAN|YESHUA|MIGUEL|EMMANUEL)\s*:\s*/gim, '');
 
-  // Find all speaker labels and split into segments
-  const matches = [];
-  while ((match = speakerPattern.exec(text)) !== null) {
-    matches.push({ index: match.index, length: match[0].length, speaker: match[1].toUpperCase() });
-  }
+  // Split into lines, group consecutive lines of the same type
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-  if (matches.length === 0) {
-    // No speaker labels found — check if it's mostly stage directions / narration
-    // or default to The Man
-    const isNarration = text.startsWith('*') || text.startsWith('The ') || text.startsWith('A ') || text.startsWith('In ');
-    if (isNarration && !text.includes('"') && !text.includes('\u201c')) {
-      addHRMessage('narrator', '', text);
-    } else {
-      addHRMessage('divine', 'THE MAN', text);
-    }
-    return;
-  }
+  let currentType = null; // 'narration' or 'speech'
+  let currentBuffer = [];
 
-  // Collect narration before first speaker
-  const preamble = text.substring(0, matches[0].index).trim();
-  if (preamble) {
-    addHRMessage('narrator', '', preamble);
-  }
-
-  // Process each speaker segment
-  for (let i = 0; i < matches.length; i++) {
-    const start = matches[i].index + matches[i].length;
-    const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
-    const content = text.substring(start, end).trim();
-    if (!content) continue;
-
-    const speaker = matches[i].speaker;
-    if (speaker === 'THE MAN' || speaker === 'YESHUA') {
+  function flush() {
+    if (currentBuffer.length === 0) return;
+    const content = currentBuffer.join('\n');
+    if (currentType === 'speech') {
       addHRMessage('divine', 'THE MAN', content);
-    } else if (speaker === 'MIGUEL') {
-      addHRMessage('detainee', 'MIGUEL', content);
-    } else if (speaker === 'EMMANUEL') {
-      addHRMessage('detainee', 'EMMANUEL', content);
+    } else {
+      addHRMessage('narrator', '', content);
     }
+    currentBuffer = [];
+  }
+
+  for (const line of lines) {
+    // Determine if this line is speech (contains quoted text) or narration
+    // Speech: line starts with a quote mark, or the entire line is wrapped in quotes
+    const isQuoted = /^\s*[\u201c"']/.test(line) || /^"/.test(line);
+
+    const lineType = isQuoted ? 'speech' : 'narration';
+
+    if (lineType !== currentType) {
+      flush();
+      currentType = lineType;
+    }
+    currentBuffer.push(line);
+  }
+  flush();
+
+  // Edge case: if nothing was parsed (empty response), show a silent moment
+  if (lines.length === 0) {
+    addHRMessage('narrator', '', 'The Man is silent. He looks at you. The look is enough.');
   }
 }
 
 function getOfflineResponse(msg) {
-  // Deeply crafted fallback responses when API is unavailable
   const m = msg.toLowerCase();
   if (m.includes('who are you') || m.includes('your name') || m.includes('are you'))
-    return `*He looks at you for a long time. The fluorescent light flickers once.*\n\nWho do you say I am?\n\n*The question hangs in the air like incense. Miguel looks away. Emmanuel closes his eyes and begins to hum something very quietly.*`;
+    return `He looks at you for a long time. The fluorescent light flickers once.\n\n"Who do you say I am?"\n\nThe question hangs in the air. Miguel looks away. Emmanuel closes his eyes and begins to hum something very quietly.`;
   if (m.includes('afraid') || m.includes('fear') || m.includes('scared'))
-    return `*His eyes are steady. They have seen this before — the soldiers, the garden, the kiss, the trial. All of it.*\n\nI have done this before. The fear is not for myself. It is for the ones who will not come. The ones who will read about this later and say: *I would have been different.*\n\n*He pauses.*\n\nWould you?`;
+    return `His eyes are steady. They have seen this before — the soldiers, the garden, the kiss, the trial. All of it.\n\n"I have done this before. The fear is not for myself. It is for the ones who will not come. The ones who will read about this later and say: I would have been different."\n\nHe pauses.\n\n"Would you?"`;
   if (m.includes('pray') || m.includes('prayer') || m.includes('god'))
-    return `*He reaches through the bars. His hand is warm. It is the oldest hand in the world.*\n\nPrayer is not words. Prayer is showing up. You are here.\n\n*Emmanuel nods slowly.* That is what I keep telling them. The prayer is the presence.`;
+    return `He reaches through the bars. His hand is warm. It is the oldest hand in the world.\n\n"Prayer is not words. Prayer is showing up. You are here."\n\nEmmanuel nods slowly from the bench, eyes closed.`;
   if (m.includes('help') || m.includes('what can i do') || m.includes('what do'))
-    return `*He smiles. It is the saddest smile you have ever seen.*\n\nDo not forget what this room smells like. Do not forget Miguel's hands. Do not forget that Emmanuel has been here fourteen months.\n\nThen go outside and do the next right thing. You already know what it is. You have always known.`;
+    return `He smiles. It is the saddest smile you have ever seen.\n\n"Do not forget what this room smells like. Do not forget Miguel's hands. Do not forget that Emmanuel has been here fourteen months."\n\nHe leans closer to the bars.\n\n"Then go outside and do the next right thing. You already know what it is. You have always known."`;
   if (m.includes('why') || m.includes('come here') || m.includes('come back'))
-    return `*The fluorescent light hums. The Man is quiet for a long time.*\n\nBecause you built fences. Because you forgot. Because there are children in rooms like this one who have done nothing wrong, and you needed to see that up close, not as a statistic.\n\n*His voice drops.*\n\nI did not come for the ones who have it figured out. I came for the ones in the cells.`;
+    return `The fluorescent light hums. He is quiet for a long time.\n\n"Because you built fences. Because you forgot. Because there are children in rooms like this one who have done nothing wrong, and you needed to see that up close, not as a statistic."\n\nHis voice drops.\n\n"I did not come for the ones who have it figured out. I came for the ones in the cells."`;
   if (m.includes('love') || m.includes('forgive') || m.includes('sorry'))
-    return `*Something shifts in the room. The fluorescent light steadies. Miguel looks up.*\n\nThere is nothing to forgive. There is only what happens next.\n\n*He looks at you with those eyes — the ones that see all the way down.*\n\n${soul.name ? soul.name + ', ' : ''}the door you walked through to get here? That was the hardest part. Everything after this is just walking.`;
+    return `Something shifts in the room. The fluorescent light steadies. Miguel looks up.\n\n"There is nothing to forgive. There is only what happens next."\n\nHe looks at you with those eyes — the ones that see all the way down.\n\n"${soul.name ? soul.name + ', the' : 'The'} door you walked through to get here? That was the hardest part. Everything after this is just walking."`;
   // Default
-  return `*The Man is silent. He looks at you the way no one has ever looked at you — not with judgment, not with analysis, but with the full weight of being known.*\n\n*Miguel shifts on the bench.*\n\nHe does this, *Miguel whispers.* He just... listens. And then you realize he heard the parts you didn't say.\n\n*The fluorescent light hums. The Man waits. He has all the time in the world. He always has.*`;
+  return `The Man is silent. He looks at you the way no one has ever looked at you — not with judgment, not with analysis, but with the full weight of being known.\n\nMiguel shifts on the bench behind him.\n\nThe fluorescent light hums. He waits. He has all the time in the world. He always has.\n\n"Tell me the thing you came here to say."`;
 }
 
 // ═══════════════════════════════════════════════════════════════
